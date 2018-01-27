@@ -29,8 +29,16 @@
 							    	<div class="row">
 							    		
 							    		<div class="col-md-6">
-							    			
-
+							    				
+							    			<div class="form-group">
+											    <div class="input-group">
+											    	<input type="text" class="form-control" id="dni" placeholder="DNI del cliente" name="dni" required>
+											    	 <span class="input-group-btn">
+												        <button class="btn btn-default" type="button" id="btn-buscar"><i class="fa fa-search" aria-hidden="true"></i></button>
+												      </span>
+												</div>
+											</div>
+	
 											  <div class="form-group">
 											    <label for="nombres">Nombres *</label>
 											    <input type="text" class="form-control" id="nombres" placeholder="Nombre del cliente" name="nombres" required>
@@ -39,11 +47,6 @@
 											  <div class="form-group">
 											    <label for="apellidos">Apellidos *</label>
 											    <input type="text" class="form-control" id="apellidos" placeholder="Apellidos del cliente" name="apellidos" required>
-											  </div>
-
-											  <div class="form-group">
-											    <label for="dni">DNI *</label>
-											    <input type="text" class="form-control" id="dni" placeholder="DNI del cliente" name="dni" required>
 											  </div>
 
 											  <div class="form-group">
@@ -65,11 +68,6 @@
 											    <label for="correo">Correo Electrónico</label>
 											    <input type="text" class="form-control" id="correo" placeholder="Correo Electrónico del cliente" name="correo" required>
 											  </div>
-
-									  
-											 
-											
-
 							    		</div>
 							    		<div class="col-md-6">
 							    			<div class="form-group">
@@ -124,7 +122,9 @@
 							    </div>
 							    <div role="tabpanel" class="tab-pane fade" id="messages">
 							    	<br>
-									<table id="table" 
+									<table id="table"
+										data-group-by="true"
+               							data-group-by-field="v4" 
 		                                data-sort-name="v1"
 		                                data-sort-order="desc"
 		                                data-search="true"
@@ -138,9 +138,8 @@
 		                              <thead>
 		                              <tr>
 		                                  <th data-field="v1">ID</th>
-		                                  <th data-field="v2">NOMBRES</th>
-		                                  <th data-field="v3">APELLIDOS</th>
-		                                  <th data-field="v4">DNI</th>
+		                                  
+		                                  <th data-field="v4">CLIENTE</th>
 		                                  <th data-field="v5">TELÉFONO</th>
 		                                  <th data-field="v6">TELÉFONO OPCIONAL</th>
 		                                  <th data-field="v7">DIRECCIÓN</th>
@@ -158,10 +157,7 @@
 		                                  
 		                                  <th data-field="v19">REGISTRADO POR</th>
 		                                  
-		                                  <th data-field="operate"
-		                                      data-align="center"
-		                                      data-formatter="operateFormatter"
-		                                      data-events="operateEvents">OPCIONES</th>
+		                                  
 		                              </tr>
 		                              </thead>
 		                          </table>
@@ -178,53 +174,9 @@
 		</div>
 	</div>
 </div>
-<!-- Modal -->
-<div class="modal fade" id="myModal_C" tabindex="-1" role="dialog" aria-labelledby="myModalLabel_C">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel_C">Editar Cliente</h4>
-      </div>
-      <?=form_open('editar-cliente-interesado',array("id" => "frm-editar-interesado"))?>
-      <div class="modal-body">
-      	<input type="hidden" id="id_c" name="id_c">
-		<div class="form-group">
-			<label for="nombres_e">Nombres *</label>
-			<input type="text" class="form-control" id="nombres_e" name="nombres_e" required>
-		</div>
 
-		<div class="form-group">
-			<label for="apellidos_e">Apellidos *</label>
-			<input type="text" class="form-control" id="apellidos_e" name="apellidos_e" required>
-		</div>
-
-		<div class="form-group">
-			<label for="telefono_e">Teléfono *</label>
-			<input type="text" class="form-control" id="telefono_e" name="telefono_e" required>
-		</div>
-
-		<div class="form-group">
-			<label for="direccion_e">Dirección</label>
-			<input type="text" class="form-control" id="direccion_e" name="direccion_e" required>
-		</div>
-
-
-		<div class="form-group">
-			<label for="descripcion_e">Descripción de consulta</label>
-			<textarea name="descripcion_e" required id="descripcion_e" class="form-control"></textarea>
-		</div>
-									  
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-      </div>
-      <?=form_close()?>
-    </div>
-  </div>
-</div>
 <script src="<?=base_url()?>assets/btable/bootstrap-table.min.js"></script>
+<script src="<?=base_url()?>assets/btable/bootstrap-table-group-by.js"></script>
 <script src="<?=base_url()?>assets/js/toastr.min.js"></script>
 <script>
 	$(function() {
@@ -232,8 +184,35 @@
     	$('[data-toggle="tooltip"]').tooltip()
     	const ruta = "<?=base_url()?>";
     	const $table = $('#table');
+    	const $buscar = $('#btn-buscar');
 
     	listar(ruta,$table);
+
+    	$buscar.on('click',function(){
+
+    		let dni = $('#dni').val();
+
+    		if( !dni || dni.length < 8 || dni.length > 8 ){
+    			toastr.warning("Ingrese un dni válido");
+    			return;
+    		}
+
+    		$.post(ruta+"getByDni",{dni},( response ) => {
+    			if( !response ){
+    				toastr.warning("Persona no registrada en el sistema como cliente.");
+    			}else{
+    				$('#nombres').val(response['v2']);
+    				$('#apellidos').val(response['v3']);
+    				$('#telefono').val(response['v5']);
+    				$('#telefono_opcional').val(response['v6']);
+    				$('#direccion').val(response['v7']);
+    				$('#correo').val(response['v8']);
+    			}
+    		},'json');
+
+
+
+    	});
 
     	$('#servicio').on('change',function(){
     		let valor = $(this).val();
@@ -267,11 +246,11 @@
     			}else{
     				toastr.success(response["mensaje"]);
     				$('#frm-clientes')[0].reset();
-    				/*
+    				
     				$table.bootstrapTable('refresh', {
-                   		url: ruta + 'getInteresados'
+                   		url: ruta + 'getClientes'
                 	});
-                	*/
+                	
                 	
     			}
     		
@@ -323,6 +302,9 @@
                     var data = response['data'];
                     $table.bootstrapTable({data: data});
                     $table.bootstrapTable('hideColumn', 'v1');
+                    
+                    $table.bootstrapTable('hideColumn', 'v4');
+                    
                     $table.bootstrapTable('hideColumn', 'v9');
                     $table.bootstrapTable('hideColumn', 'v11');
                     $table.bootstrapTable('hideColumn', 'v14');
@@ -331,31 +313,6 @@
               });
 		}
 		
-
-      	function operateFormatter(value, row, index) {
-          return [
-          	'<a class="edit" href="javascript:void(0)" data-toggle="tooltip" title="Editar" style="margin-left: 10px">',
-              '<button type="button" class="btn btn-success"><i class="fa fa-pencil-square-o"></i></button>',
-            '</a>',
-            
-          ].join('');
-        }
-
-         window.operateEvents = {
-            'click .edit': function (e, value, row, index) {
-              console.log(row);
-              $('#id_c').val(row['v1']);
-              $('#nombres_e').val(row['v2']);
-              $('#apellidos_e').val(row['v3']);
-              $('#telefono_e').val(row['v4']);
-              $('#direccion_e').val(row['v5']);
-              $('#descripcion_e').val(row['v6']);
-              	$('#myModal_C').modal({
-				  keyboard: false,
-				  backdrop: 'static'
-				})
-            },
-        };
 	
 </script>
 <body>

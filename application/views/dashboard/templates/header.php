@@ -10,6 +10,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 	<link rel="stylesheet" href="<?=base_url()?>assets/css/dashboard.css">
   <link rel="stylesheet" href="<?=base_url()?>assets/btable/bootstrap-table.min.css">
   <link rel="stylesheet" href="<?=base_url()?>assets/btable/bootstrap-editable.css">
+    <link rel="stylesheet" href="<?=base_url()?>assets/btable/bootstrap-table-group-by.css">
   <link rel="stylesheet" href="<?=base_url()?>assets/font-awesome/css/font-awesome.min.css">
   <link rel="stylesheet" href="<?=base_url()?>assets/css/toastr.min.css">
   <link rel="icon" href="<?=base_url()?>assets/imagenes/claro.png">

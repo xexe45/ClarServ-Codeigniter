@@ -86,6 +86,22 @@ class ClientesController extends CI_Controller {
 
 	}
 
+	public function listaByDni(){
+
+		if($this->input->is_ajax_request()){
+			if($this->input->post('dni')){
+				$dni = self::limpiador($this->input->post('dni'));
+				$cliente = $this->Cliente->listaByDni($dni);
+				header('Content-Type: application/x-json; charset:utf-8');
+				echo json_encode($cliente);
+			}
+			
+		}else{
+			show_404();
+		}
+
+	}
+
 	private function limpiador($parametro){
 		return $this->security->xss_clean(strip_tags($parametro));
 	}

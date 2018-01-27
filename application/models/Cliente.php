@@ -4,10 +4,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Cliente extends CI_Model {
 
 	public function __construct()
-		{
-			parent::__construct();
+	{
+		parent::__construct();
 			
-		}
+	}
 
 	public function add(array $cliente){
 		$query = "CALL sp_add_cliente(?,?,?,?,?,?,?,?,?,?,?,?,?,?,@s)";
@@ -27,6 +27,14 @@ class Cliente extends CI_Model {
 		$clientes = $this->db->query($query);
 		$this->db->close();
 		return $clientes->result();
+	}
+
+	public function listaByDni(string $dni){
+		$query = "CALL sp_listar_cliente_by_dni(?)";
+		$this->load->database();
+		$cliente = $this->db->query($query,$dni);
+		$this->db->close();
+		return $cliente->row();
 	}
 	
 
