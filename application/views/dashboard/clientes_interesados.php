@@ -147,6 +147,109 @@
     </div>
   </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal_Co" tabindex="-1" role="dialog" aria-labelledby="myModalLabel_Co">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel_Co">Migrar a Cliente</h4>
+      </div>
+      <?=form_open('migrar-cliente',array("id" => "frm-migrar"))?>
+      <div class="modal-body">
+		<input type="hidden" id="id_co" name="id_co">
+		<div class="row">
+			<div class="col-md-6">
+							    				
+				<div class="form-group">
+											    
+					<label for="dni_c">Dni *</label>
+					<input type="text" class="form-control" id="dni_c" placeholder="Dni del cliente" name="dni_c" required>
+												
+				</div>
+	
+				<div class="form-group">
+						<label for="nombres_c">Nombres *</label>
+						<input type="text" class="form-control" id="nombres_c" placeholder="Nombre del cliente" name="nombres_c" required readonly>
+				</div>
+
+				<div class="form-group">
+						<label for="apellidos_c">Apellidos *</label>
+						<input type="text" class="form-control" id="apellidos_c" placeholder="Apellidos del cliente" name="apellidos_c" required readonly>
+				</div>
+
+				<div class="form-group">
+						<label for="telefono_c">Teléfono *</label>
+						<input type="text" class="form-control" id="telefono_c" placeholder="Teléfono del cliente" name="telefono_c" required readonly>
+				</div>
+
+				<div class="form-group">
+						<label for="telefono_opcional_c">Teléfono Opcional </label>
+						<input type="text" class="form-control" id="telefono_opcional_c" placeholder="Teléfono Opcional del cliente" name="telefono_opcional_c">
+				</div>
+
+				<div class="form-group">
+						<label for="direccion_c">Dirección</label>
+						<input type="text" class="form-control" id="direccion_c" placeholder="Dirección del cliente" name="direccion_c" required readonly>
+				</div>
+
+				<div class="form-group">
+						<label for="correo_c">Correo Electrónico</label>
+						<input type="text" class="form-control" id="correo_c" placeholder="Correo Electrónico del cliente" name="correo_c" required>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label for="codigo_c">Código de Acuerdo *</label>
+					<input type="text" class="form-control" id="codigo_c" name="codigo_c" placeholder="Código de acuerdo">
+				</div>
+					<div class="form-group">
+						<label for="servicio_c">Servicio a contratar *</label>
+						<select name="servicio_c" id="servicio_c" class="form-control">
+							<option value="">Seleccionar Servicio a contratar</option>
+							<?php foreach ($servicios as $servicio): ?>
+							    						
+							  <option value="<?=$servicio->v1?>"><?=$servicio->v2?></option>
+							    						
+							    						
+							<?php endforeach ?>
+							    					
+						</select>
+						<div class="form-group">
+							<label for="precio_promo_c">Precio de Costo Primer Mes *</label>
+											   
+							<input type="text" class="form-control" id="precio_promo_c" name="precio_promo_c" readonly>
+						</div>
+						<div class="form-group">
+							<label for="precio_normal_c">Precio de Costo Normal *</label>
+										
+							<input type="text" class="form-control" id="precio_normal_c" readonly name="precio_normal_c">
+						</div>
+
+						<div class="form-group">
+								<label for="instalacion_c">Fecha de Instalación *</label>
+								<input type="date" class="form-control" id="instalacion_c" name="instalacion_c" required>
+						</div>
+
+						<div class="form-group">
+								<label for="observaciones_c">Observaciones a tener en cuenta</label>
+								<textarea name="observaciones_c" required id="observaciones_c" class="form-control"></textarea>
+						</div>	
+									
+					</div>
+			</div>				    		 			    		
+		</div>
+									  
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+      </div>
+      <?=form_close()?>
+    </div>
+  </div>
+</div>
 <script src="<?=base_url()?>assets/btable/bootstrap-table.min.js"></script>
 <script src="<?=base_url()?>assets/js/toastr.min.js"></script>
 <script>
@@ -158,6 +261,20 @@
 
     	listar(ruta,$table);
     	
+    	$('#servicio_c').on('change',function(){
+    		let valor = $(this).val();
+    		if(!valor){
+    			$('#precio_promo_c').val("");
+    			$('#precio_normal_c').val("");
+    			return;
+    		}
+    		$.get(ruta+"combo-servicios/"+valor,(response)=>{
+    			//console.log(response);
+    			$('#precio_promo_c').val(response['v1']);
+    			$('#precio_normal_c').val(response['v2']);
+
+    		},'json');
+    	});
 
     	$('#frm-interesados').on('submit',function(e){
     		e.preventDefault();
@@ -212,8 +329,37 @@
     		},'json');
     		
     		return false;
+    	});
+
+    	$('#frm-migrar').on('submit',function(e){
+    		e.preventDefault();
+
+    		let data = $(this).serialize();
+    		let metodo = $(this).attr('method');
+    		let action = $(this).attr('action');
+    		
+    		$.post(action,data,(response)=>{
+    			console.log(response);
+    			if(!response["hecho"]){
+    				toastr.error(response["mensaje"]);
+    			}else{
+    				toastr.success(response["mensaje"]);    					
+    					$table.bootstrapTable('refresh', {
+                   			url: ruta + 'getInteresados'
+                		});
+    			}
+
+    			$('#id_co').val("");
+    			$('#frm-migrar')[0].reset();
+    			$('#myModal_Co').modal('hide');
+    			
+    		},'json');
+    		
+    		return false;
 	
     	});
+
+
 
 	});
 
@@ -238,15 +384,17 @@
       	function operateFormatter(value, row, index) {
           return [
           	'<a class="edit" href="javascript:void(0)" data-toggle="tooltip" title="Editar" style="margin-left: 10px">',
-              '<button type="button" class="btn btn-success"><i class="fa fa-pencil-square-o"></i></button>',
-            '</a>',
+              '<button type="button" class="btn btn-success btn-sm"><i class="fa fa-pencil-square-o"></i></button>',
+            '</a><br><br>',
+            '<a class="edit2" href="javascript:void(0)" data-toggle="tooltip" title="Migrar a cliente" style="margin-left: 10px">',
+              '<button type="button" class="btn btn-primary btn-sm"><i class="fa fa-user""></i></button>',
+            '</a>'
             
           ].join('');
         }
 
          window.operateEvents = {
             'click .edit': function (e, value, row, index) {
-              console.log(row);
               $('#id_c').val(row['v1']);
               $('#nombres_e').val(row['v2']);
               $('#apellidos_e').val(row['v3']);
@@ -258,6 +406,18 @@
 				  backdrop: 'static'
 				})
             },
+
+            'click .edit2': function(e,value,row,index){
+            	$('#id_co').val(row['v1']);
+            	$('#nombres_c').val(row['v2']);
+            	$('#apellidos_c').val(row['v3']);
+            	$('#telefono_c').val(row['v4']);
+            	$('#direccion_c').val(row['v5']);
+            	$('#myModal_Co').modal({
+				  keyboard: false,
+				  backdrop: 'static'
+				})
+            }
         };
 	
 </script>

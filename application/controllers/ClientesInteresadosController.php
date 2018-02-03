@@ -10,12 +10,14 @@ class ClientesInteresadosController extends CI_Controller {
 		$this->load->helper('form');
 		$this->load->library('form_validation');
 		$this->load->model('ClienteInteresado');
+		$this->load->model('Servicio');
 	}
 
 	public function index()
 	{
+		$data["servicios"] = $this->Servicio->comboServicios();
 		$this->load->view('dashboard/templates/header');
-		$this->load->view('dashboard/clientes_interesados');
+		$this->load->view('dashboard/clientes_interesados',$data);
 	}
 
 	public function add(){
@@ -41,6 +43,51 @@ class ClientesInteresadosController extends CI_Controller {
 				$responder["hecho"] = true;
 			}else{
 				$responder["mensaje"] = "Cliente no fue agregado, esto puede ser a que el cliente que intenta registrar ya se encuentra registrado";
+				$responder["hecho"] = false;
+			}
+			
+		}else{
+			$responder["mensaje"] = validation_errors();
+			$responder["hecho"] = false;
+		}
+
+		header('Content-Type: application/x-json; charset:utf-8');
+		echo json_encode($responder);
+	}
+
+	public function migrar(){
+
+		if(!$this->input->is_ajax_request()){ return; }
+
+		if(!$this->input->post('id_co')){ return; }
+
+		$responder = array();
+
+		if($this->form_validation->run('migrar_cliente')){
+
+			$id = self::limpiador($this->input->post('id_co'));
+			$user_id = $this->session->userdata('id');
+			$nombres = self::limpiador($this->input->post('nombres_c'));
+			$apellidos = self::limpiador($this->input->post('apellidos_c'));
+			$dni = self::limpiador($this->input->post('dni_c'));
+			$telefono = self::limpiador($this->input->post('telefono_c'));
+			$telefono_opcional = self::limpiador($this->input->post('telefono_opcional_c'));
+			$direccion = self::limpiador($this->input->post('direccion_c'));
+			$correo = self::limpiador($this->input->post('correo_c'));
+			$codigo = self::limpiador($this->input->post('codigo_c'));
+			$servicio = self::limpiador($this->input->post('servicio_c'));
+			$precio_promo = self::limpiador($this->input->post('precio_promo_c'));
+			$precio_normal = self::limpiador($this->input->post('precio_normal_c'));
+			$instalacion = self::limpiador($this->input->post('instalacion_c'));
+			$observaciones = self::limpiador($this->input->post('observaciones_c'));
+			
+			$data = array($id,$nombres,$apellidos,$dni,$telefono,$telefono_opcional,$direccion,$correo,$codigo,$servicio,$precio_promo,$precio_normal,$user_id,$instalacion,$observaciones);
+			
+			if($this->ClienteInteresado->migrar($data)){
+				$responder["mensaje"] = "Cliente Migrado Correctamente";
+				$responder["hecho"] = true;
+			}else{
+				$responder["mensaje"] = "Cliente no fue migrado, esto puede ser a que el cliente que intenta registrar ya se encuentra registrado";
 				$responder["hecho"] = false;
 			}
 			

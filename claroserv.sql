@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 27-01-2018 a las 06:44:24
+-- Tiempo de generación: 03-02-2018 a las 05:19:00
 -- Versión del servidor: 10.1.21-MariaDB
 -- Versión de PHP: 7.1.1
 
@@ -174,6 +174,35 @@ u.direccion as v7, u.rol_id as v8, r.rol as v9,u.email as v10, u.estado as v11, 
 from users u inner join roles r on u.rol_id = r.id;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_migrar_cliente` (IN `idcliente_e` INT, IN `nombres_e` VARCHAR(255), IN `apellidos_e` VARCHAR(255), IN `dni_e` CHAR(8), IN `telefono_e` VARCHAR(15), IN `telefono_opcional_e` VARCHAR(15), IN `direccion_e` TEXT, IN `correo_e` TEXT, IN `codigo_e` INT, IN `plan_id_e` INT, IN `precio_mes_oferta_e` FLOAT, IN `precio_normal_e` FLOAT, IN `user_id_e` INT, IN `fecha_instalacion_e` DATE, IN `observaciones_e` TEXT, OUT `res` BOOLEAN)  BEGIN
+declare exit handler
+  for SQLEXCEPTION
+begin
+rollback;
+set res=false;
+end;
+start transaction;
+set @id_cliente = (select id from clientes where dni = dni_e);
+
+if @id_cliente > 0 then
+INSERT INTO `acuerdo`(codigo,cliente_id,plan_id,precio_mes_oferta,precio_normal,user_id,fecha_registro,fecha_instalacion,observaciones)
+VALUES(codigo_e,@id_cliente,plan_id_e,precio_mes_oferta_e,precio_normal_e,user_id_e,NOW(),fecha_instalacion_e,observaciones_e);
+
+DELETE FROM cliente_interesado WHERE id = idcliente_e;
+else
+INSERT INTO `clientes`(nombres,apellidos,dni,telefono,telefono_opcional,direccion,correo_electronico,created_at)
+VALUES(nombres_e,apellidos_e,dni_e,telefono_e,telefono_opcional_e,direccion_e,correo_e,NOW());
+SET @cliente_id = LAST_INSERT_ID();
+INSERT INTO `acuerdo`(codigo,cliente_id,plan_id,precio_mes_oferta,precio_normal,user_id,fecha_registro,fecha_instalacion,observaciones)
+VALUES(codigo_e,@cliente_id,plan_id_e,precio_mes_oferta_e,precio_normal_e,user_id_e,NOW(),fecha_instalacion_e,observaciones_e);
+DELETE FROM cliente_interesado WHERE id = idcliente_e;
+end if;
+
+commit;
+set res=true;
+
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_update_cliente_interesado` (IN `idcliente_e` INT, IN `nombre_e` VARCHAR(255), IN `apellidos_e` VARCHAR(255), IN `telefono_e` VARCHAR(20), IN `direccion_e` TEXT, IN `descripcion_e` TEXT, OUT `res` BOOLEAN)  BEGIN
 declare exit handler
   for SQLEXCEPTION
@@ -264,7 +293,9 @@ INSERT INTO `acuerdo` (`id`, `codigo`, `cliente_id`, `plan_id`, `precio_mes_ofer
 (1, 1128304, 1, 1, 59, 119, 1, '2018-01-23 03:00:14', '2018-01-26', 'Todo correcto'),
 (2, 1128305, 2, 3, 99, 199, 1, '2018-01-27 00:25:34', '2018-01-30', 'Todo correcto'),
 (3, 1128306, 1, 3, 99, 199, 1, '2018-01-27 00:28:09', '2018-01-31', 'Todo correcto'),
-(4, 1128306, 4, 3, 99, 199, 1, '2018-01-27 00:39:15', '2018-01-31', 'Todo correcto.');
+(4, 1128307, 4, 3, 99, 199, 1, '2018-02-02 21:58:26', '2018-01-31', 'Todo correcto.'),
+(5, 1128308, 5, 2, 74, 149, 1, '2018-02-02 21:59:02', '2018-02-05', 'Todo correcto'),
+(6, 1128309, 6, 1, 59, 119, 5, '2018-02-02 23:17:32', '2018-02-06', 'A partir del medio día.');
 
 -- --------------------------------------------------------
 
@@ -292,7 +323,9 @@ CREATE TABLE `clientes` (
 INSERT INTO `clientes` (`id`, `nombres`, `apellidos`, `dni`, `telefono`, `telefono_opcional`, `direccion`, `correo_electronico`, `created_at`, `updated_at`) VALUES
 (1, 'Roco Reynaldo', 'Lachira Flores', '12345673', '0732084', '', 'AA.HH. José Olaya j-12', 'roco@gmail.com', '2018-01-23 03:00:14', '2018-01-23 08:00:14'),
 (2, 'Leonidas', 'Carrasco Zapata', '12345679', '967099190', '', 'Urb. La Alborada j-15', 'leonidad@gmail.com', '2018-01-27 00:25:34', '2018-01-27 05:25:34'),
-(4, 'Arnold', 'Villaramarín Contreras', '70351234', '965011102', '', 'Urb. Los Geranios l-10', 'arnold@gmail.com', '2018-01-27 00:39:15', '2018-01-27 05:39:15');
+(4, 'Arnold', 'Villaramarín Contreras', '70351234', '965011102', '', 'Urb. Los Geranios l-10', 'arnold@gmail.com', '2018-01-27 00:39:15', '2018-01-27 05:39:15'),
+(5, 'Marcela', 'Ato Peña', '02980717', '073209082', '309089', 'AA.HH Los Algarrobos m-12', 'marcela@gmail.com', '2018-02-02 21:59:02', '2018-02-03 02:59:02'),
+(6, 'Elmer', 'Chunga Carranza', '12345678', '967099108', '', 'Av. Lopez Alburjar k-19', 'elchunga@gmail.com', '2018-02-02 23:17:32', '2018-02-03 04:17:32');
 
 -- --------------------------------------------------------
 
@@ -317,7 +350,7 @@ CREATE TABLE `cliente_interesado` (
 
 INSERT INTO `cliente_interesado` (`id`, `nombre`, `apellidos`, `telefono`, `direccion`, `descripcion`, `created_at`, `updated_at`) VALUES
 (1, 'Juan', 'Perez López', '969066163', 'Urb.Piura z-12', 'Interesado en el plan 3Play de 4Mb', '2018-01-21 14:01:12', '2018-01-21 19:29:03'),
-(2, 'Marcela', 'Ato Peña', '073209082', 'AA.HH Los Algarrobos m-12', 'Interesada en el plan 2Play de 8Mb', '2018-01-21 14:30:01', '2018-01-21 19:30:13');
+(3, 'Juan', 'Torres Lopez', '967099194', 'Urb. Los Titanes I-12', 'Interesado en el paquete 3MB', '2018-02-02 23:08:21', '2018-02-03 04:08:21');
 
 -- --------------------------------------------------------
 
@@ -458,7 +491,6 @@ INSERT INTO `users` (`id`, `nombre`, `apellidos`, `dni`, `telefono`, `telefono_o
 (1, 'César', 'Lachira Córdova', '70365818', '965088183', '073201084', 'Jose Olaya j-12 Piura', 1, 'lachiracesar@gmail.com', 'A', '$2a$08$3uWDDed3OSQm9WjQq48uW.AgVU0ugVovpx.KSUXyV5Vx.zU.utr6C', '2018-01-17 19:59:22', '2018-01-18 00:59:22'),
 (2, 'Alex', 'Lachira Córdova', '77160406', '969657100', '073201084', 'Jose Olaya j-12', 2, 'alexor@gmail.com', 'A', '$2a$08$6zoUIbfMWwmiljB084HwJeBSPi9Rt3rlgifuN7UjbGNWSUjbQk5/y', '2018-01-17 20:46:55', '2018-01-18 03:38:19'),
 (3, 'Fernando Alejandro', 'Regentte Medina', '49856321', '974933192', '', 'Urb.Miraflores G-10', 2, 'fregente@gmail.com', 'A', '$2a$08$I8eRaHhO7Y.nf4nWGFqujO6BDglj7jpAg3aFPNOxuhsfp1qTnQXkO', '2018-01-19 19:19:46', '2018-01-20 00:19:46'),
-(4, 'Juan', 'Torres López', '76483919', '96101182', '', 'Urb. Los Titanes L-34', 3, 'jtl_93@gmail.com', 'A', '$2a$08$YWMo.wKyqH35pm6BO8bQWepmyHod7smsQRhUhE7F8MRuU4DDA8EL6', '2018-01-19 19:21:02', '2018-01-20 00:21:02'),
 (5, 'Jhon', 'Ipanaque Moran', '78912930', '993011228', '', 'Sechura', 4, 'jhon@gmail.com', 'A', '$2a$08$vYFjhGIKC0zs1vpu./Huz.klgyjP0xx4hMlpAvVIKddCTxeqKNgR.', '2018-01-19 19:22:11', '2018-01-20 00:22:11'),
 (6, 'Maria Rosa', 'Lopez Cárdenas', '02459418', '073301923', '', 'AA.HH. 18 de Mayo A12', 5, 'maria@gmail.com', 'A', '$2a$08$qsJOXUhzmLaP4LF5x0yrRe8jZvXuZb6uhIFvswmnhjSu0fiuYCL2O', '2018-01-19 19:23:21', '2018-01-21 18:59:57');
 
@@ -470,7 +502,8 @@ INSERT INTO `users` (`id`, `nombre`, `apellidos`, `dni`, `telefono`, `telefono_o
 -- Indices de la tabla `acuerdo`
 --
 ALTER TABLE `acuerdo`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `codigo` (`codigo`);
 
 --
 -- Indices de la tabla `clientes`
@@ -529,17 +562,17 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de la tabla `acuerdo`
 --
 ALTER TABLE `acuerdo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- AUTO_INCREMENT de la tabla `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- AUTO_INCREMENT de la tabla `cliente_interesado`
 --
 ALTER TABLE `cliente_interesado`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT de la tabla `metodos`
 --

@@ -40,6 +40,18 @@ class ClienteInteresado extends CI_Model {
 		return $clientes->result();
 	}
 
+	public function migrar(array $cliente){
+		$query = "CALL sp_migrar_cliente(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,@s)";
+		$this->load->database();
+		$this->db->trans_start();
+		$this->db->query($query,$cliente);
+		$res = $this->db->query('select @s as res');
+		$this->db->trans_complete();
+		$this->db->close();
+		return $res->row()->res;	
+	}
+
+
 }
 
 /* End of file ClienteInteresado.php */

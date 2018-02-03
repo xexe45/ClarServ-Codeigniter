@@ -30,5 +30,8 @@ $route['clientes']['post'] = 'ClientesController/add';
 $route['combo-servicios/(:num)']['get'] = 'ClientesController/comboServicios/$1';
 $route['getClientes']['get'] = 'ClientesController/lista';
 $route['getByDni']['post'] = 'ClientesController/listaByDni';
+$route['migrar-cliente']['post'] = 'ClientesInteresadosController/migrar';
+$route['campo']['get'] = 'CampoController';
+
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;

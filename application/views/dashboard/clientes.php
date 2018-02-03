@@ -32,6 +32,7 @@
 							    				
 							    			<div class="form-group">
 											    <div class="input-group">
+											    	
 											    	<input type="text" class="form-control" id="dni" placeholder="DNI del cliente" name="dni" required>
 											    	 <span class="input-group-btn">
 												        <button class="btn btn-default" type="button" id="btn-buscar"><i class="fa fa-search" aria-hidden="true"></i></button>
@@ -209,9 +210,6 @@
     				$('#correo').val(response['v8']);
     			}
     		},'json');
-
-
-
     	});
 
     	$('#servicio').on('change',function(){

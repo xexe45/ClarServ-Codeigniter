@@ -113,6 +113,25 @@ $config = array(
         ),
 
 
+        'migrar_cliente'
+        => array( //dentro de este arreglo crear una linea de arreglos por cada campo que quiera trabajar
+            
+            array('field' => 'nombres_c','label' => 'Nombres de Cliente','rules' => 'required|is_string|trim|max_length[255]'),
+            array('field' => 'apellidos_c','label' => 'Apellidos de Cliente','rules' => 'required|is_string|trim|max_length[255]'),
+            array('field' => 'dni_c','label' => 'DNI','rules' => 'required|numeric|trim|exact_length[8]'),
+            array('field' => 'telefono_c','label' => 'Teléfono Principal','rules' => 'required|numeric|trim|max_length[15]'),
+            array('field' => 'direccion_c','label' => 'Direccion de cliente','rules' => 'required|is_string|trim'),
+            array('field' => 'correo_c','label' => 'Correo electrónico de cliente','rules' => 'required|is_string|trim|valid_email'),
+            array('field' => 'codigo_c','label' => 'Código de contrato','rules' => 'required|numeric|trim'),
+            array('field' => 'servicio_c','label' => 'Servicio a instalar','rules' => 'required|numeric|trim'),
+            array('field' => 'precio_promo_c','label' => 'Precio de Promo','rules' => 'required|numeric|trim'),
+            array('field' => 'precio_normal_c','label' => 'Precio Normal','rules' => 'required|numeric|trim'),
+            array('field' => 'instalacion_c','label' => 'Día a realizar instalación','rules' => 'required'),
+           
+        ),
+
+
+
 
           'add_producto'
         => array(

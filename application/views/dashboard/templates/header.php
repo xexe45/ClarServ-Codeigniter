@@ -83,7 +83,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			  </a>
 			  
 			  <a href="#" class="list-group-item">Morbi leo risus</a>
-			  <a href="#" class="list-group-item">Porta ac consectetur ac</a>
+			  <a href="<?=base_url()?>campo" class="list-group-item <?php if ($this->uri->segment(1) == 'campo'): ?>
+          active
+        <?php endif ?>"><i class="fa fa-address-book" aria-hidden="true"></i> Día de Campo</a>
 
         <div class="dropdown">
           <button class="btn btn-default dropdown-toggle list-group-item <?php if ($this->uri->segment(1) == 'clientes' || $this->uri->segment(1) == 'clientes-interesados'): ?>
