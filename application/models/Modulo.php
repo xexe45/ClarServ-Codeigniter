@@ -46,8 +46,16 @@ class Modulo extends CI_Model {
 							->get();
 		$this->db->close();
 		return $modulo->row();
-
 	}	
+
+	public function comboModulos(){
+		$this->load->database();
+		$query = $this->db->select('id as v1, modulo as v2')
+								->from('modulos')
+								->get();
+		$this->db->close();
+		return $query->result();
+	}
 
 	public function insertar_metodos(array $data){
 		$this->load->database();

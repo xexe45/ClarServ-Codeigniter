@@ -58,7 +58,7 @@
     			if(!response["ejecutado"]){
     				toastr.error(response["mensaje"]);
     			}else{
-    				location.href = base_url + "/home";
+    				location.href = base_url + "home";
     			}
     		
     			$('#frm-login')[0].reset();

@@ -8,6 +8,7 @@ class RolController extends CI_Controller {
 		parent::__construct();
 		$this->load->helper('url');
 		$this->load->helper('form');
+		$this->load->helper('util');
 		$this->load->library('form_validation');
 		$this->load->model('Rol');
 		$this->load->model('Modulo');
@@ -15,8 +16,10 @@ class RolController extends CI_Controller {
 
 	public function index()
 	{
+		$roles = $this->Rol->comboRoles();
+		$modulos = $this->Modulo->comboModulos();
 		$this->load->view('dashboard/templates/header');
-		$this->load->view('dashboard/roles');
+		$this->load->view('dashboard/roles',compact('roles','modulos'));
 	}
 
 	public function add(){
@@ -91,6 +94,17 @@ class RolController extends CI_Controller {
 			$roles["data"] = $this->Rol->lista();
 			header('Content-Type: application/x-json; charset:utf-8');
 			echo json_encode($roles);
+		}else{
+			show_404();
+		}
+	}
+
+	public function permisos($id){
+
+		if($this->input->is_ajax_request()){
+			$permisos["data"] = $this->Rol->getMyModules($id);
+			header('Content-Type: application/x-json; charset:utf-8');
+			echo json_encode($permisos);
 		}else{
 			show_404();
 		}

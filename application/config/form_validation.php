@@ -47,6 +47,13 @@ $config = array(
         => array(
             array('field' => 'modulo','label' => 'Módulo','rules' => 'required|is_string|trim|max_length[255]'),
                       
+        ),
+
+        'add_permiso'
+        => array(
+            array('field' => 'rol_id','label' => 'Rol','rules' => 'required|numeric|trim'),
+            array('field' => 'modulo_id','label' => 'Módulo','rules' => 'required|numeric|trim'),
+                      
         ), 
 
  

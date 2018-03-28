@@ -39,7 +39,25 @@ class Rol extends CI_Model {
 		return $roles->result();
 	}
 
-	
+	public function comboRoles(){
+		$this->load->database();
+		$query = $this->db->select('id as v1, rol as v2')
+								->from('roles')
+								->get();
+		$this->db->close();
+		return $query->result();
+	}
+
+	public function getMyModules($id){
+		$this->load->database();
+		$query = $this->db->select('permisos.modulo_id as v1, modulos.modulo as v2')
+								->from('permisos')
+								->join('modulos','modulos.id = permisos.modulo_id')
+								->where(array('rol_id' => $id))
+								->get();
+		$this->db->close();
+		return $query->result();
+	}
 	
 
 }

@@ -82,7 +82,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			    Dashboard
 			  </a>
 			  
-			  <a href="#" class="list-group-item">Morbi leo risus</a>
+			  
 			  <a href="<?=base_url()?>campo" class="list-group-item <?php if ($this->uri->segment(1) == 'campo'): ?>
           active
         <?php endif ?>"><i class="fa fa-address-book" aria-hidden="true"></i> Día de Campo</a>
@@ -117,7 +117,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           </ul>
         </div>
 
-			  <a href="#" class="list-group-item">Reportes</a>
+			  <a href="#" class="list-group-item"><i class="fa fa-bar-chart" aria-hidden="true"></i> Reportes</a>
         <a href="<?=base_url()?>sistema" class="list-group-item <?php if ($this->uri->segment(1) == 'sistema'): ?>
           active
         <?php endif ?>"><i class="fa fa-cog" aria-hidden="true"></i> Sistema
@@ -130,6 +130,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       <li><a href="home">Home</a></li>
       <li class="active"><?=$this->uri->segment(1)?></li>
     </ol>
+    <?php if ($this->session->flashdata('message')): ?>
+      <div class="alert alert-<?=$this->session->flashdata('css')?>">
+        <?=$this->session->flashdata('message')?>
+      </div>
+    <?php endif ?>
 			<div class="panel panel-default">
 				<div class="panel-body">
 			    	<div class="container-fluid">

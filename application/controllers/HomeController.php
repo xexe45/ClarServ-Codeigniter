@@ -10,12 +10,23 @@ class HomeController extends CI_Controller {
 		$this->load->helper('form');
 		$this->load->library('form_validation');
 		$this->load->model('Modulo');
+		$this->load->model('HomeModel');
 	}
 
 	public function index()
 	{
+		$total_clientes = $this->HomeModel->countClientes();
+		$total_acuerdos = $this->HomeModel->countAcuerdos();
+		$total_clientes_interesados = $this->HomeModel->countClientesInteresados();
+		$total_instalaciones = $this->HomeModel->countInstalaciones();
+
+		$data['clientes'] = $total_clientes->total;
+		$data['acuerdos'] = $total_acuerdos->total;
+		$data['interesados'] = $total_clientes_interesados->total;
+		$data['instalaciones'] = $total_instalaciones->total;
+
 		$this->load->view('dashboard/templates/header');
-		$this->load->view('dashboard/home');
+		$this->load->view('dashboard/home', $data);
 	}
 
 	public function myFunctions(){

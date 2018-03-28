@@ -1,28 +1,34 @@
-	          			<div class="col-md-6">
+	          			<div class="col-md-12">
 	          				<div class="panel panel-default">
 							  <div class="panel-body text-center">
-							    <h2><i class="fa fa-file-text" aria-hidden="true"></i> 50 </h2>
-							    <p>Contratos Realizados</p>
+							    <h2><span id="numberContratos"></span> <i class="fa fa-file-text" aria-hidden="true"></i>  </h2>
+							    <p><b>Contratos Realizados</b></p>
+							   
 							  </div>
 							</div>
-							<button class="btn btn-primary btn-block" type="button" data-toggle="modal" data-target="#myModal_Co">Registrar Cliente</button>
-							<br>
-	          			</div>
-	          			<div class="col-md-6">
-	          				<div class="panel panel-default">
-							  <div class="panel-body text-center">
-							    <h2><i class="fa fa-phone" aria-hidden="true"></i> 5 </h2>
-							    <p>Clientes Interesados</p>
-							  </div>
-							</div>
-							<button data-toggle="modal" data-target="#myModal" class="btn btn-primary btn-block" type="button">Registrar Cliente Interesado</button>
-	          			</div>
-	          			
+														
+	          			</div>			
+	           		</div>
+	           		<div class="row">
+	           			<div class="col-md-6">
+	           				<div class="form-group">
+	           					<button class="btn btn-primary btn-block" type="button" data-toggle="modal" data-target="#myModal_Co">Registrar Cliente</button>
+	           				</div>
+	           				
+	           			</div>
+
+	           			<div class="col-md-6">
+	           				<div class="form-group">
+	           					<button data-toggle="modal" data-target="#myModal" class="btn btn-primary btn-block" type="button">Registrar Cliente Interesado</button>
+	           				</div>
+	           				
+	           			</div>
 	           		</div>
 	           		
             	</div>
 			  </div>
-			</div>	
+			</div>
+				
 		</div>
 	</div>
 </div>
@@ -34,7 +40,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="myModalLabel_Co">Registrar Contrato</h4>
       </div>
-      <?=form_open('clientes',array("id" =>"frm-clientes"))?>
+      <?=form_open('clientes-campo',array("id" =>"frm-clientes"))?>
       <div class="modal-body">
 		
 		<div class="row">
@@ -73,13 +79,13 @@
 											  </div>
 
 											  <div class="form-group">
-											    <label for="direccion">Dirección</label>
+											    <label for="direccion">Dirección *</label>
 											    <input type="text" class="form-control" id="direccion" placeholder="Dirección del cliente" name="direccion" required>
 											  </div>
 
 											  <div class="form-group">
 											    <label for="correo">Correo Electrónico</label>
-											    <input type="text" class="form-control" id="correo" placeholder="Correo Electrónico del cliente" name="correo" required>
+											    <input type="text" class="form-control" id="correo" placeholder="Correo Electrónico del cliente" name="correo">
 											  </div>
 							    		</div>
 							    		<div class="col-md-6">
@@ -182,6 +188,10 @@
     </div>
   </div>
 </div>
+
+<!-- Modal -->
+
+<script src="<?=base_url()?>assets/canvasjs/canvasjs.min.js"></script>
 <script src="<?=base_url()?>assets/js/toastr.min.js"></script>
 <script>
 
@@ -190,6 +200,9 @@
 		const ruta = "<?=base_url()?>";
 		const $buscar = $('#btn-buscar');
 		
+		getContratos(ruta + "misContratos");
+		
+
 		$buscar.on('click',function(){
 
     		let dni = $('#dni').val();
@@ -199,8 +212,10 @@
     			return;
     		}
 
-    		$.post(ruta+"getByDni",{dni},( response ) => {
+    		$.post(ruta+"getByDniCampo",{dni},( response ) => {
+    			console.log(response)
     			if( !response ){
+
     				toastr.warning("Persona no registrada en el sistema como cliente.");
     			}else{
     				$('#nombres').val(response['v2']);
@@ -221,7 +236,7 @@
     			$('#precio_normal').val("");
     			return;
     		}
-    		$.get(ruta+"combo-servicios/"+valor,(response)=>{
+    		$.get(ruta+"combo-servicios-campo/"+valor,(response)=>{
     			//console.log(response);
     			$('#precio_promo').val(response['v1']);
     			$('#precio_normal').val(response['v2']);
@@ -240,8 +255,10 @@
     			console.log(response);
     			if(!response["hecho"]){
     				toastr.error(response["mensaje"]);
+    				
     			}else{
     				toastr.success(response["mensaje"]);
+    				getContratos(ruta + "misContratos");
     			}
     		
     			$('#frm-clientes')[0].reset();
@@ -277,5 +294,13 @@
     	});
 
 	});
+
+	function getContratos(url){
+		$.get(url,{},(response)=>{
+			console.log(response['contratos']);
+			$('#numberContratos').text(response['contratos']);
+		},'json');
+	}
+
 </script>
 <body>
